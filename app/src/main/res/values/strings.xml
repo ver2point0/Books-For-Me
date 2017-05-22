@@ -3,4 +3,5 @@
     <string name="hint_text">Enter an author or book title</string>
     <string name="no_books_found">No books found by that author or title.\nPlease try other terms.</string>
     <string name="no_internet_connection">No internet connection available.\nPlease check your connection settings.</string>
+    <string name="search_button">search_button_context</string>
 </resources>
