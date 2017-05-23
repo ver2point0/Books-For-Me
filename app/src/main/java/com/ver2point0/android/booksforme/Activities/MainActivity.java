@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private BookListingAdapter mBookListingAdapter;
     private TextView mTextView;
     private static final String SEARCH_RESULTS = "bookListingSearchResults";
+    private static final String GOOGLE_API_URL =
+            "https://www.googleapis.com/books/v1/volumes?q=search+";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,12 @@ public class MainActivity extends AppCompatActivity {
     private boolean isInternetConnectionAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        return networkInfo.isConnectedOrConnecting();
+        try {
+            return networkInfo != null && networkInfo.isConnected();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private void updateUi(List<BookListing> bookListings) {
@@ -90,9 +97,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getUrlForHttpRequest() {
-        final String normalUrl = "https://www.googleapis.com/books/v1/volumes?q=search+";
         String formatSearchInput = getSearchInput().trim().replaceAll("\\s+", "+");
-        return normalUrl + formatSearchInput;
+        return GOOGLE_API_URL + formatSearchInput;
     }
 
     private class BookListingAsyncTask extends AsyncTask<URL, Void, List<BookListing>> {
@@ -119,13 +125,14 @@ public class MainActivity extends AppCompatActivity {
             updateUi(bookListings);
         }
 
-        private URL createUrl(String url) {
+        private URL createUrl(String stringUrl) {
+            URL url = null;
             try {
-                return new URL(url);
+                url = new URL(stringUrl);
             } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
+                Log.e("MainActivity", "Problem creating the URL", e);
             }
+            return url;
         }
 
         private String makeHttpRequest(URL url) throws IOException {
@@ -136,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             HttpURLConnection urlConnection = null;
-            InputStream inputStream;
+            InputStream inputStream = null;
 
             try {
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -151,10 +158,13 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("MainActivity", "Error response code: " + urlConnection.getResponseCode());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e("MainActivity", "Problem retrieving the Google Books API JSON results.", e);
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
                 }
             }
             return jsonResponse;
