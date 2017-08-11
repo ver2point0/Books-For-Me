@@ -13,4 +13,4 @@ Search for books by author or title
 - Only the first 10 results will be displayed
 
 # Screenshot
-<img src="https://cloud.githubusercontent.com/assets/12492121/26333936/9c11da2a-3f2f-11e7-9b91-1e11b72426eb.png" width="300"/>
+<img src="https://user-images.githubusercontent.com/12492121/29232755-5e8c7f7c-7ebb-11e7-9011-c2c262045b1d.png" width="300"/>
